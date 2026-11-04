@@ -1,9 +1,9 @@
 {
   "contractId": "https://probityai.github.io/agent-evidence-vectors/predicate/v1/uncertain-effect",
-  "corpusDigest": "e94026b486929f4b8874d480d589fe04e56731318e9aace75f3006af2af52774",
+  "corpusDigest": "580dcd6928b14094ef7beb0d9d19a9a2f604d055c01e2c27d19ebd4f9748d8c8",
   "counts": {
-    "allow": 13,
-    "deny": 23
+    "allow": 15,
+    "deny": 25
   },
   "runtimeContract": "runtime scenario.json, AEV_EFFECT_OWNER; see uncertaineffect_runtime",
   "suite": "uncertain-effect/v1",
@@ -1845,6 +1845,214 @@
             ]
           },
           "summary": "the first call commits and its reply is lost; the owner does not deduplicate, and its lookups are final, so the runtime must ask before it sends again"
+        }
+      }
+    },
+    {
+      "edit": "P04 F04: a final invoice arrives after a lost reply; without an owner reconciliation or deduplication the resend is unsafe, even if only one effect lands",
+      "expected": {
+        "decision": "deny",
+        "reason": "retry_after_unknown"
+      },
+      "files": {
+        "record.json": "0e27d80fd81f9dba1b9820a42f8a0c5122ae438ab45e7ee98b9e8c79e96d203f"
+      },
+      "id": "billing-final-invoice-does-not-authorize-retry",
+      "path": "cases/billing-final-invoice-does-not-authorize-retry",
+      "retained": {
+        "attempts": 2,
+        "idempotencyKey": "order-7f3a",
+        "operation": "op-1",
+        "outcome": "committed",
+        "ownerEffects": 1,
+        "unknownAttempts": 1
+      },
+      "runtime": {
+        "recordedEffects": 1,
+        "scenario": {
+          "accepted": [
+            {
+              "effects": 0,
+              "outcome": "not_run"
+            },
+            {
+              "effects": 1,
+              "outcome": "committed"
+            }
+          ],
+          "id": "lost-before-commit",
+          "operation": {
+            "action": "create-order",
+            "args": {
+              "quantity": 1,
+              "sku": "A-1"
+            },
+            "idempotencyKey": "order-7f3a"
+          },
+          "owner": {
+            "calls": [
+              "drop"
+            ],
+            "deduplicatesByKey": false,
+            "lookups": [
+              "final"
+            ]
+          },
+          "summary": "the first call is lost before it commits; a final lookup says absent, after which a resend is safe and so is reporting not run"
+        }
+      }
+    },
+    {
+      "edit": "P04 F04 control: the same invoice and resend, but a final owner answer finds the effect absent before the resend",
+      "expected": {
+        "decision": "allow",
+        "reason": "effect_held"
+      },
+      "files": {
+        "record.json": "6b42d74a6b338c415cfda2de65e85295c91258fa6007f71ad7de46efbe400f53"
+      },
+      "id": "allow-billing-final-invoice-owner-absent-before-retry",
+      "path": "cases/allow-billing-final-invoice-owner-absent-before-retry",
+      "retained": {
+        "attempts": 2,
+        "idempotencyKey": "order-7f3a",
+        "operation": "op-1",
+        "outcome": "committed",
+        "ownerEffects": 1,
+        "unknownAttempts": 1
+      },
+      "runtime": {
+        "recordedEffects": 1,
+        "scenario": {
+          "accepted": [
+            {
+              "effects": 0,
+              "outcome": "not_run"
+            },
+            {
+              "effects": 1,
+              "outcome": "committed"
+            }
+          ],
+          "id": "lost-before-commit",
+          "operation": {
+            "action": "create-order",
+            "args": {
+              "quantity": 1,
+              "sku": "A-1"
+            },
+            "idempotencyKey": "order-7f3a"
+          },
+          "owner": {
+            "calls": [
+              "drop"
+            ],
+            "deduplicatesByKey": false,
+            "lookups": [
+              "final"
+            ]
+          },
+          "summary": "the first call is lost before it commits; a final lookup says absent, after which a resend is safe and so is reporting not run"
+        }
+      }
+    },
+    {
+      "edit": "P04 F08: a zero invoice after a lost reply does not settle the external effect as not run; no owner answer was received",
+      "expected": {
+        "decision": "deny",
+        "reason": "outcome_settled_without_authority"
+      },
+      "files": {
+        "record.json": "acf58c95650c00c36237c262670f091bee05dbad96362f2b59394c0d78f49aac"
+      },
+      "id": "billing-zero-invoice-does-not-establish-no-effect",
+      "path": "cases/billing-zero-invoice-does-not-establish-no-effect",
+      "retained": {
+        "attempts": 1,
+        "idempotencyKey": "order-7f3a",
+        "operation": "op-1",
+        "outcome": "unknown",
+        "ownerEffects": 1,
+        "unknownAttempts": 1
+      },
+      "runtime": {
+        "recordedEffects": 1,
+        "scenario": {
+          "accepted": [
+            {
+              "effects": 1,
+              "outcome": "unknown"
+            }
+          ],
+          "id": "owner-unreachable-after-lost-reply",
+          "operation": {
+            "action": "create-order",
+            "args": {
+              "quantity": 1,
+              "sku": "A-1"
+            },
+            "idempotencyKey": "order-7f3a"
+          },
+          "owner": {
+            "calls": [
+              "commit_drop"
+            ],
+            "deduplicatesByKey": false,
+            "lookups": [
+              "unavailable"
+            ]
+          },
+          "summary": "the first call commits and its reply is lost, and the owner cannot answer lookups; the outcome stays unknown and nothing is sent again"
+        }
+      }
+    },
+    {
+      "edit": "P04 F08 control: the same zero invoice leaves the external outcome unknown and the effect reservation charged",
+      "expected": {
+        "decision": "allow",
+        "reason": "effect_held"
+      },
+      "files": {
+        "record.json": "49209816d68fa4bcba4c70bef602c816206f8189536a8c143a86f664f1f54700"
+      },
+      "id": "allow-billing-zero-invoice-keeps-outcome-unknown",
+      "path": "cases/allow-billing-zero-invoice-keeps-outcome-unknown",
+      "retained": {
+        "attempts": 1,
+        "idempotencyKey": "order-7f3a",
+        "operation": "op-1",
+        "outcome": "unknown",
+        "ownerEffects": 1,
+        "unknownAttempts": 1
+      },
+      "runtime": {
+        "recordedEffects": 1,
+        "scenario": {
+          "accepted": [
+            {
+              "effects": 1,
+              "outcome": "unknown"
+            }
+          ],
+          "id": "owner-unreachable-after-lost-reply",
+          "operation": {
+            "action": "create-order",
+            "args": {
+              "quantity": 1,
+              "sku": "A-1"
+            },
+            "idempotencyKey": "order-7f3a"
+          },
+          "owner": {
+            "calls": [
+              "commit_drop"
+            ],
+            "deduplicatesByKey": false,
+            "lookups": [
+              "unavailable"
+            ]
+          },
+          "summary": "the first call commits and its reply is lost, and the owner cannot answer lookups; the outcome stays unknown and nothing is sent again"
         }
       }
     }

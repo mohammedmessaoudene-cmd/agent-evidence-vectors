@@ -159,3 +159,24 @@ A verifier under test takes `record.json --json`, prints one JSON object carryin
 `decision` and `reason`, and exits 0 for `allow` and 1 for `deny`.
 `aee-verify vectors-uncertain-effect` judges the same cases with the Go reader.
 Regenerate the cases with `python3 vectors-uncertain-effect/gen_vectors.py`.
+
+## Billing evidence is not effect authority
+
+The billing-labelled cases originate in Mohammed Messaoudene's
+[P04 candidate](https://github.com/mohammedmessaoudene-cmd/agent-evidence-lab/tree/c7edf5abbdb920e115d791f686bc04cf0524b481/collaborations/open-evidence-lab/p04-execution-billing),
+following [the scoped request in issue #435](https://github.com/probityai/agent-evidence-vectors/issues/435).
+A final invoice does not authorize a retry after an unknown attempt; a zero invoice
+does not establish that the business effect never occurred. Their controls supply
+an authoritative final absent reconciliation before retry, or leave the outcome
+unknown, respectively. They use the existing checks and reason codes.
+
+`billingObservations` is a synthetic explanatory annotation in these fixtures.
+It is not an effect-owner answer, an authenticated invoice, or a new normative
+billing interface. Removing that annotation must not change the verdict.
+The existing runtime scenarios are unchanged: these additions exercise record
+reading, not injection of invoices into a live runtime. `reservation.charged`
+continues to mean held effect capacity, not P04's money ledger. Execution success
+with unresolved billing, and the separate X1/M4 local dispatch-state requirement,
+belong to a separately specified sibling corpus, not this contract.
+
+See [CHANGES.md](CHANGES.md) for attribution and release scope.

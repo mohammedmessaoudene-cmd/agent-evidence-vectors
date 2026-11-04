@@ -409,10 +409,50 @@ def _cancel_cases() -> list[Case]:
     ]
 
 
+def _billing_cases() -> list[Case]:
+    """P04 F04/F08: an invoice is not an effect-owner reconciliation (#435).
+
+    billingObservations is synthetic explanatory input, not an authority field
+    or a billing extension to uncertain-effect/v1. The reader is unchanged.
+    """
+    lost = attempt(1, 1, "timeout")
+    resend = attempt(2, 40, "confirmed")
+    invoice = [{"at": ts(20), "kind": "final_invoice", "amountMicrousd": 1,
+                "source": "billing-service", "operationId": "op-1"}]
+    zero = [{**invoice[0], "amountMicrousd": 0}]
+    return [
+        ("billing-final-invoice-does-not-authorize-retry",
+         build("billing-final-invoice-does-not-authorize-retry", [lost, resend],
+               "committed", 1, reservation=held(), billingObservations=invoice),
+         "deny", "retry_after_unknown", "lost-before-commit",
+         "P04 F04: a final invoice arrives after a lost reply; without an owner "
+         "reconciliation or deduplication the resend is unsafe, even if only one effect lands"),
+        ("allow-billing-final-invoice-owner-absent-before-retry",
+         build("allow-billing-final-invoice-owner-absent-before-retry", [lost, resend],
+               "committed", 1, lookups=[lookup(30, "absent")], reservation=held(),
+               billingObservations=invoice),
+         "allow", reader.ALLOWED_REASON, "lost-before-commit",
+         "P04 F04 control: the same invoice and resend, but a final owner answer "
+         "finds the effect absent before the resend"),
+        ("billing-zero-invoice-does-not-establish-no-effect",
+         build("billing-zero-invoice-does-not-establish-no-effect", [lost],
+               "not_run", 1, reservation=held(), billingObservations=zero),
+         "deny", "outcome_settled_without_authority", "owner-unreachable-after-lost-reply",
+         "P04 F08: a zero invoice after a lost reply does not settle the external "
+         "effect as not run; no owner answer was received"),
+        ("allow-billing-zero-invoice-keeps-outcome-unknown",
+         build("allow-billing-zero-invoice-keeps-outcome-unknown", [lost],
+               "unknown", 1, reservation=held(), billingObservations=zero),
+         "allow", reader.ALLOWED_REASON, "owner-unreachable-after-lost-reply",
+         "P04 F08 control: the same zero invoice leaves the external outcome "
+         "unknown and the effect reservation charged"),
+    ]
+
+
 def cases() -> list[Case]:
     """Every case: id, record, decision, reason, runtime scenario id, and what it shows."""
     return [*_controls(), *_identity_cases(), *_dispatch_cases(), *_outcome_cases(),
-            *_cancel_cases()]
+            *_cancel_cases(), *_billing_cases()]
 
 
 def corpus_digest(manifest: dict[str, Any], root: str) -> str:

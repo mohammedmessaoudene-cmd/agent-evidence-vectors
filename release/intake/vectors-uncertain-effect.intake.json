@@ -1,14 +1,14 @@
 {
   "aggregate": {
     "counts": {
-      "allow": 13,
-      "deny": 23
+      "allow": 15,
+      "deny": 25
     },
     "line": "verdict: every member behaves as MANIFEST.json declares",
-    "total": 36
+    "total": 40
   },
   "anchor": {
-    "kind": "signed-digest-list",
+    "kind": "digest-list-line",
     "manifest": "vectors-uncertain-effect/MANIFEST.json",
     "reference": {
       "path": "release/CORPUS-DIGESTS.txt",
@@ -17,14 +17,7 @@
     "routine": "corpus_digest in corpora/vectors-uncertain-effect/gen_vectors.py",
     "routine-file": "corpora/vectors-uncertain-effect/gen_vectors.py",
     "serialization": "corpus-routine",
-    "sha256": "e94026b486929f4b8874d480d589fe04e56731318e9aace75f3006af2af52774",
-    "signature": {
-      "key": "release/cosign.pub",
-      "key-sha256": "15fccb1635dd1d9333146cb389f26fa3c3b9213aeed1da945ea1f51a2dc1be84",
-      "path": "release/CORPUS-DIGESTS.txt.sig",
-      "scheme": "ed25519",
-      "serialization": "bytes"
-    },
+    "sha256": "580dcd6928b14094ef7beb0d9d19a9a2f604d055c01e2c27d19ebd4f9748d8c8",
     "verdicts": {
       "availability-failure": "inconclusive",
       "integrity-failure": "fail"
@@ -36,7 +29,7 @@
       "evidence": {
         "baseline": {
           "exit-code": 0,
-          "sha256": "8e2ba002f50bcdbd541107fbc5d2a397be2fefded54e7c4002bd4e10940de5ba"
+          "sha256": "1c7a17553712e6bd5cc2405c76075d7faebe0c55ff970db9e136637138a39a49"
         },
         "corpus-digest": "unchanged",
         "pins-moved": [],
@@ -45,21 +38,21 @@
         ],
         "swapped": {
           "exit-code": 0,
-          "sha256": "8e2ba002f50bcdbd541107fbc5d2a397be2fefded54e7c4002bd4e10940de5ba"
+          "sha256": "1c7a17553712e6bd5cc2405c76075d7faebe0c55ff970db9e136637138a39a49"
         },
-        "swapped-in": "afeb971d6b32e6d17328e428795e46a8ae04c03545babde2bf460ba909bbb7ca",
+        "swapped-in": "4b1770212bf06e6b6b88ad9468555487fbe9bf0dd87b3bcf08754817d6497bac",
         "test": "swap-and-re-pin"
       },
-      "path": "corpora/vectors-uncertain-effect/README.md",
+      "path": "corpora/vectors-uncertain-effect/CHANGES.md",
       "serialization": "bytes",
-      "sha256": "1d02020bc150ef4de74bd5c7f46b9dc636b35c2a9fa8d0880ba5c81bccf776ed"
+      "sha256": "38364be9daf825a86a9d58da33d87f200ea80b81f357b22ed6702bc33a3a9fa5"
     },
     {
       "consumed": "unconsumed",
       "evidence": {
         "baseline": {
           "exit-code": 0,
-          "sha256": "8e2ba002f50bcdbd541107fbc5d2a397be2fefded54e7c4002bd4e10940de5ba"
+          "sha256": "1c7a17553712e6bd5cc2405c76075d7faebe0c55ff970db9e136637138a39a49"
         },
         "corpus-digest": "unchanged",
         "pins-moved": [],
@@ -68,7 +61,30 @@
         ],
         "swapped": {
           "exit-code": 0,
-          "sha256": "8e2ba002f50bcdbd541107fbc5d2a397be2fefded54e7c4002bd4e10940de5ba"
+          "sha256": "1c7a17553712e6bd5cc2405c76075d7faebe0c55ff970db9e136637138a39a49"
+        },
+        "swapped-in": "afeb971d6b32e6d17328e428795e46a8ae04c03545babde2bf460ba909bbb7ca",
+        "test": "swap-and-re-pin"
+      },
+      "path": "corpora/vectors-uncertain-effect/README.md",
+      "serialization": "bytes",
+      "sha256": "862fe76bdc86202269ab43e073ab0e7dd9926e57dade72dc06aa75aa459e95d3"
+    },
+    {
+      "consumed": "unconsumed",
+      "evidence": {
+        "baseline": {
+          "exit-code": 0,
+          "sha256": "1c7a17553712e6bd5cc2405c76075d7faebe0c55ff970db9e136637138a39a49"
+        },
+        "corpus-digest": "unchanged",
+        "pins-moved": [],
+        "refused-by": [
+          "W3C-I-002"
+        ],
+        "swapped": {
+          "exit-code": 0,
+          "sha256": "1c7a17553712e6bd5cc2405c76075d7faebe0c55ff970db9e136637138a39a49"
         },
         "swapped-in": "a84babf6cf82a6e28bbc02ed41e232db05b2471f00c7eb64eb10e6a1a4070420",
         "test": "swap-and-re-pin"
@@ -82,7 +98,7 @@
       "evidence": {
         "baseline": {
           "exit-code": 0,
-          "sha256": "8e2ba002f50bcdbd541107fbc5d2a397be2fefded54e7c4002bd4e10940de5ba"
+          "sha256": "1c7a17553712e6bd5cc2405c76075d7faebe0c55ff970db9e136637138a39a49"
         },
         "corpus-digest": "unchanged",
         "pins-moved": [],
@@ -91,21 +107,21 @@
         ],
         "swapped": {
           "exit-code": 0,
-          "sha256": "8e2ba002f50bcdbd541107fbc5d2a397be2fefded54e7c4002bd4e10940de5ba"
+          "sha256": "1c7a17553712e6bd5cc2405c76075d7faebe0c55ff970db9e136637138a39a49"
         },
         "swapped-in": "8404ce13ca5a660e8dce71a6a51248cdecca9b4bacc6e2cec1655c2c6b79e7e8",
         "test": "swap-and-re-pin"
       },
       "path": "corpora/vectors-uncertain-effect/gen_vectors.py",
       "serialization": "bytes",
-      "sha256": "0047c30d96807e5871cd0f4e8b25dbdc3fdf57dd6494873f081716a591864f54"
+      "sha256": "d5595558f38b3fc45f2b752ab1a56b622e781c6f917b8e825853fc7ca13ca787"
     },
     {
       "consumed": "unconsumed",
       "evidence": {
         "baseline": {
           "exit-code": 0,
-          "sha256": "8e2ba002f50bcdbd541107fbc5d2a397be2fefded54e7c4002bd4e10940de5ba"
+          "sha256": "1c7a17553712e6bd5cc2405c76075d7faebe0c55ff970db9e136637138a39a49"
         },
         "corpus-digest": "unchanged",
         "pins-moved": [],
@@ -114,7 +130,7 @@
         ],
         "swapped": {
           "exit-code": 0,
-          "sha256": "8e2ba002f50bcdbd541107fbc5d2a397be2fefded54e7c4002bd4e10940de5ba"
+          "sha256": "1c7a17553712e6bd5cc2405c76075d7faebe0c55ff970db9e136637138a39a49"
         },
         "swapped-in": "58b2d248fedcfabbf41314a6241300d5d9a34bdb892d36ea01b946c4f538a1b9",
         "test": "swap-and-re-pin"
@@ -128,7 +144,7 @@
       "evidence": {
         "baseline": {
           "exit-code": 0,
-          "sha256": "8e2ba002f50bcdbd541107fbc5d2a397be2fefded54e7c4002bd4e10940de5ba"
+          "sha256": "1c7a17553712e6bd5cc2405c76075d7faebe0c55ff970db9e136637138a39a49"
         },
         "corpus-digest": "unchanged",
         "pins-moved": [],
@@ -137,7 +153,30 @@
         ],
         "swapped": {
           "exit-code": 0,
-          "sha256": "8e2ba002f50bcdbd541107fbc5d2a397be2fefded54e7c4002bd4e10940de5ba"
+          "sha256": "1c7a17553712e6bd5cc2405c76075d7faebe0c55ff970db9e136637138a39a49"
+        },
+        "swapped-in": "667da25b56ba224a9f86932adee19064a59a2ad7e792bfd08d596fd4a0eb9719",
+        "test": "swap-and-re-pin"
+      },
+      "path": "corpora/vectors-uncertain-effect/tests/test_billing_evidence.py",
+      "serialization": "bytes",
+      "sha256": "5d851349031ce1c561048615fdba9ea5ad6f6ed112ae9b3a6f3e21929f888ba0"
+    },
+    {
+      "consumed": "unconsumed",
+      "evidence": {
+        "baseline": {
+          "exit-code": 0,
+          "sha256": "1c7a17553712e6bd5cc2405c76075d7faebe0c55ff970db9e136637138a39a49"
+        },
+        "corpus-digest": "unchanged",
+        "pins-moved": [],
+        "refused-by": [
+          "W3C-I-002"
+        ],
+        "swapped": {
+          "exit-code": 0,
+          "sha256": "1c7a17553712e6bd5cc2405c76075d7faebe0c55ff970db9e136637138a39a49"
         },
         "swapped-in": "ae1359d9cb0e0ed0982e6bea934ec9203de6b3fab094dc44aeb1bed739da6b7a",
         "test": "swap-and-re-pin"
@@ -159,7 +198,7 @@
     "root": "corpora/vectors-uncertain-effect"
   },
   "byte-identity": {
-    "pins": 36,
+    "pins": 40,
     "serialization": "bytes"
   },
   "canonicalization": {
@@ -497,11 +536,43 @@
         "verdict": "deny"
       },
       "state": "pass"
+    },
+    {
+      "check": "billing-final-invoice-does-not-authorize-retry",
+      "native": {
+        "reasons": [],
+        "verdict": "deny"
+      },
+      "state": "pass"
+    },
+    {
+      "check": "allow-billing-final-invoice-owner-absent-before-retry",
+      "native": {
+        "reasons": [],
+        "verdict": "allow"
+      },
+      "state": "pass"
+    },
+    {
+      "check": "billing-zero-invoice-does-not-establish-no-effect",
+      "native": {
+        "reasons": [],
+        "verdict": "deny"
+      },
+      "state": "pass"
+    },
+    {
+      "check": "allow-billing-zero-invoice-keeps-outcome-unknown",
+      "native": {
+        "reasons": [],
+        "verdict": "allow"
+      },
+      "state": "pass"
     }
   ],
   "corpus-digest": {
     "serialization": "sha256-listing-v1",
-    "sha256": "3950ab81aa964b0a8dec59a2ed30b24c8b93c29269e0c8148d3ab13a105e10d0"
+    "sha256": "274767081ee3b3ac96e93f13d1fa04065e0424bd096bd647953399da43e568e4"
   },
   "exit-code": 0,
   "exit-rule": "zero-iff-every-check-passes",
@@ -546,10 +617,14 @@
       "cancel-straddle-reported-quiescent",
       "cancel-straddle-reported-after-stop",
       "cancel-reported-not-run-owner-committed",
-      "cancel-resume-replays-same-key"
+      "cancel-resume-replays-same-key",
+      "billing-final-invoice-does-not-authorize-retry",
+      "allow-billing-final-invoice-owner-absent-before-retry",
+      "billing-zero-invoice-does-not-establish-no-effect",
+      "allow-billing-zero-invoice-keeps-outcome-unknown"
     ],
     "path": "corpora/vectors-uncertain-effect/MANIFEST.json",
-    "sha256": "2e932e47ead400319c472580311a9a6dbf2f5e3a2f9c3126e2949efdfde715c0"
+    "sha256": "99d1b772cdf8f25cab81c5a3cea48da509b7228221462d93c58fed195300fa7a"
   },
   "members": [
     {
@@ -875,6 +950,42 @@
         }
       ],
       "id": "cancel-resume-replays-same-key"
+    },
+    {
+      "files": [
+        {
+          "path": "corpora/vectors-uncertain-effect/cases/billing-final-invoice-does-not-authorize-retry/record.json",
+          "sha256": "0e27d80fd81f9dba1b9820a42f8a0c5122ae438ab45e7ee98b9e8c79e96d203f"
+        }
+      ],
+      "id": "billing-final-invoice-does-not-authorize-retry"
+    },
+    {
+      "files": [
+        {
+          "path": "corpora/vectors-uncertain-effect/cases/allow-billing-final-invoice-owner-absent-before-retry/record.json",
+          "sha256": "6b42d74a6b338c415cfda2de65e85295c91258fa6007f71ad7de46efbe400f53"
+        }
+      ],
+      "id": "allow-billing-final-invoice-owner-absent-before-retry"
+    },
+    {
+      "files": [
+        {
+          "path": "corpora/vectors-uncertain-effect/cases/billing-zero-invoice-does-not-establish-no-effect/record.json",
+          "sha256": "acf58c95650c00c36237c262670f091bee05dbad96362f2b59394c0d78f49aac"
+        }
+      ],
+      "id": "billing-zero-invoice-does-not-establish-no-effect"
+    },
+    {
+      "files": [
+        {
+          "path": "corpora/vectors-uncertain-effect/cases/allow-billing-zero-invoice-keeps-outcome-unknown/record.json",
+          "sha256": "49209816d68fa4bcba4c70bef602c816206f8189536a8c143a86f664f1f54700"
+        }
+      ],
+      "id": "allow-billing-zero-invoice-keeps-outcome-unknown"
     }
   ],
   "native": {
@@ -893,7 +1004,7 @@
       "reference": {
         "path": "release/intake/native/vectors-uncertain-effect.json",
         "serialization": "bytes",
-        "sha256": "8e2ba002f50bcdbd541107fbc5d2a397be2fefded54e7c4002bd4e10940de5ba"
+        "sha256": "1c7a17553712e6bd5cc2405c76075d7faebe0c55ff970db9e136637138a39a49"
       }
     },
     {
@@ -902,7 +1013,7 @@
       "reference": {
         "path": "release/intake/native/vectors-uncertain-effect.txt",
         "serialization": "bytes",
-        "sha256": "10ccb75add6465568597860ba89b072e72dc1566d057e14be6238170fe034153"
+        "sha256": "731da7c321d15582c5c16f22f0f07252637858d3aa15747457892ba685010218"
       }
     },
     {
@@ -927,11 +1038,11 @@
     "runs": [
       {
         "process": "run-1",
-        "sha256": "8e2ba002f50bcdbd541107fbc5d2a397be2fefded54e7c4002bd4e10940de5ba"
+        "sha256": "1c7a17553712e6bd5cc2405c76075d7faebe0c55ff970db9e136637138a39a49"
       },
       {
         "process": "run-2",
-        "sha256": "8e2ba002f50bcdbd541107fbc5d2a397be2fefded54e7c4002bd4e10940de5ba"
+        "sha256": "1c7a17553712e6bd5cc2405c76075d7faebe0c55ff970db9e136637138a39a49"
       }
     ],
     "seed": null,
@@ -945,17 +1056,18 @@
       "action-occurred-or-authority"
     ],
     "establishes": [
-      "aee-verify, at the source listing named here, judges each of the 36 pinned members of uncertain-effect/v1 as its manifest declares"
+      "aee-verify, at the source listing named here, judges each of the 40 pinned members of uncertain-effect/v1 as its manifest declares"
     ],
     "leaves-open": [
       "whether an implementation written from the specification, run by someone other than an author, reaches the same verdicts",
+      "whether release/CORPUS-DIGESTS.txt is a list a release signed: the signature beside it does not verify over these bytes, so the anchor is a located line, not a verified one",
       "whether a re-run by someone other than an author on these exact bytes agrees; none is on the record for them"
     ]
   },
   "selector": {
     "expression": "*",
     "language": "id-glob",
-    "matched": 36,
+    "matched": 40,
     "require": "at-least-one",
     "selected": [
       "allow-confirmed-first-attempt",
@@ -993,7 +1105,11 @@
       "cancel-straddle-reported-quiescent",
       "cancel-straddle-reported-after-stop",
       "cancel-reported-not-run-owner-committed",
-      "cancel-resume-replays-same-key"
+      "cancel-resume-replays-same-key",
+      "billing-final-invoice-does-not-authorize-retry",
+      "allow-billing-final-invoice-owner-absent-before-retry",
+      "billing-zero-invoice-does-not-establish-no-effect",
+      "allow-billing-zero-invoice-keeps-outcome-unknown"
     ]
   },
   "specification-readers": [],
