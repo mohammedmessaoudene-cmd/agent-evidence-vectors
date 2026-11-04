@@ -1,0 +1,33 @@
+name: P04 pinned source audit bundle
+on:
+  push:
+    branches: [work/p04-source-audit-20261104]
+permissions:
+  contents: read
+jobs:
+  export:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          fetch-depth: 2
+          persist-credentials: false
+      - name: Export the immutable public upstream source
+        shell: bash
+        run: |
+          set -euo pipefail
+          source=493d850f4bfde279fb91423f6c343078d50a3f02
+          test "$(git rev-parse HEAD^)" = "$source"
+          mkdir -p "$RUNNER_TEMP/p04-source"
+          git archive --format=zip --output="$RUNNER_TEMP/p04-source/upstream-source.zip" "$source"
+          printf '%s\n' "$source" > "$RUNNER_TEMP/p04-source/SOURCE_COMMIT.txt"
+          git rev-parse "$source^{tree}" > "$RUNNER_TEMP/p04-source/SOURCE_TREE.txt"
+          cd "$RUNNER_TEMP/p04-source"
+          sha256sum upstream-source.zip > SHA256SUMS
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: p04-pinned-upstream-source
+          path: ${{ runner.temp }}/p04-source/
+          if-no-files-found: error
+          retention-days: 7
