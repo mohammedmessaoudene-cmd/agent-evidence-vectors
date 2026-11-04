@@ -47,35 +47,35 @@ jobs:
           mkdir -p ../evidence
           git rev-parse HEAD > ../evidence/base-sha.txt
           python corpora/vectors-uncertain-effect/gen_vectors.py
-          uv sync --locked --extra generators
+          uv sync --locked --extra dev --extra generators
       - name: Lint focused Python delta
         working-directory: source
         shell: bash
         run: |
           set -euo pipefail
-          uv run --locked --extra generators ruff check corpora/vectors-uncertain-effect/gen_vectors.py corpora/vectors-uncertain-effect/tests/test_billing_evidence.py | tee ../evidence/ruff.log
+          uv run --locked --extra dev --extra generators ruff check corpora/vectors-uncertain-effect/gen_vectors.py corpora/vectors-uncertain-effect/tests/test_billing_evidence.py 2>&1 | tee ../evidence/ruff.log
       - name: Check records and focused regression suite
         working-directory: source
         shell: bash
         run: |
           set -euo pipefail
-          uv run --locked --extra generators python -m pytest -q corpora/vectors-uncertain-effect/tests | tee ../evidence/pytest.log
-          uv run --locked --extra generators python packaging/run_vectors.py --corpus vectors-uncertain-effect --report ../evidence/cli-report.json | tee ../evidence/cli.log
+          uv run --locked --extra dev --extra generators python -m pytest -q corpora/vectors-uncertain-effect/tests 2>&1 | tee ../evidence/pytest.log
+          uv run --locked --extra dev --extra generators python packaging/run_vectors.py --corpus vectors-uncertain-effect --report ../evidence/cli-report.json 2>&1 | tee ../evidence/cli.log
       - name: Regenerate dependent records using upstream generators
         working-directory: source
         shell: bash
         run: |
           set -euo pipefail
-          uv run --locked --extra generators python scripts/regenerate-derived.py | tee ../evidence/regenerate.log
-          uv run --locked --extra generators python scripts/regenerate-derived.py --check | tee ../evidence/regenerate-check.log
+          uv run --locked --extra dev --extra generators python scripts/regenerate-derived.py 2>&1 | tee ../evidence/regenerate.log
+          uv run --locked --extra dev --extra generators python scripts/regenerate-derived.py --check 2>&1 | tee ../evidence/regenerate-check.log
       - name: Check count and corpus registration
         working-directory: source
         shell: bash
         run: |
           set -euo pipefail
           git add corpora/vectors-uncertain-effect release/CORPUS-DIGESTS.txt release/intake interop/agentavow-signed-map-v1/source-lock.json
-          uv run --locked --extra generators python scripts/count-gate.py | tee ../evidence/count.log
-          uv run --locked --extra generators python scripts/corpus-registry.py --check | tee ../evidence/registry.log
+          uv run --locked --extra dev --extra generators python scripts/count-gate.py 2>&1 | tee ../evidence/count.log
+          uv run --locked --extra dev --extra generators python scripts/corpus-registry.py --check 2>&1 | tee ../evidence/registry.log
           git diff --cached --check
           python - <<'PY'
           import subprocess
