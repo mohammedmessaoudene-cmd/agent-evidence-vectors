@@ -40,8 +40,10 @@ jobs:
           set -euo pipefail
           test "$(git rev-parse HEAD)" = "$BASE_SHA"
           echo 'b849d2b2c99e0611a4daa9a517c57efaf4138d544e798eab6ee9d6c5015f4fde  ../preparation/source.patch' | sha256sum -c -
+          echo 'f38c18c63baaf4509ae6e504af425c2aca3804d163ee86e494134e56ddd3ce14  ../preparation/lint.patch' | sha256sum -c -
           git apply --check ../preparation/source.patch
           git apply --index ../preparation/source.patch
+          git apply --index ../preparation/lint.patch
           mkdir -p ../evidence
           git rev-parse HEAD > ../evidence/base-sha.txt
           python corpora/vectors-uncertain-effect/gen_vectors.py

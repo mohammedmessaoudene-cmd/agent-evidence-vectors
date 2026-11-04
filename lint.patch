@@ -1,0 +1,12 @@
+--- a/corpora/vectors-uncertain-effect/tests/test_billing_evidence.py
++++ b/corpora/vectors-uncertain-effect/tests/test_billing_evidence.py
+@@ -17,7 +17,8 @@
+ EXPECTED = {
+     "billing-final-invoice-does-not-authorize-retry": ("deny", "retry_after_unknown"),
+     "allow-billing-final-invoice-owner-absent-before-retry": ("allow", "effect_held"),
+-    "billing-zero-invoice-does-not-establish-no-effect": ("deny", "outcome_settled_without_authority"),
++    "billing-zero-invoice-does-not-establish-no-effect":
++        ("deny", "outcome_settled_without_authority"),
+     "allow-billing-zero-invoice-keeps-outcome-unknown": ("allow", "effect_held"),
+ }
+ 
