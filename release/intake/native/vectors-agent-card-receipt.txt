@@ -1,5 +1,0 @@
-suite: agent-card-receipt/v1
-members: 44
-  accept: 11
-  reject: 33
-verdict: every member behaves as MANIFEST.json declares

@@ -1,0 +1,112 @@
+name: p04-billing-preparation
+on:
+  push:
+    branches: [work/p04-billing-prepare-20261104]
+permissions:
+  contents: write
+jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      UV_LINK_MODE: copy
+      PYTHONDONTWRITEBYTECODE: '1'
+      TARGET_BRANCH: contrib/p04-billing-evidence-20261104
+      BASE_SHA: 493d850f4bfde279fb91423f6c343078d50a3f02
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          path: preparation
+          persist-credentials: false
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: contrib/p04-billing-evidence-20261104
+          path: source
+          fetch-depth: 0
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: '3.13'
+      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e
+        with:
+          go-version: '1.26.x'
+          cache: false
+      - uses: astral-sh/setup-uv@37802adc94f370d6bfd71619e3f0bf239e1f3b78
+        with:
+          python-version: '3.13'
+      - name: Apply reviewed source delta to exact base
+        working-directory: source
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "$BASE_SHA"
+          echo 'b849d2b2c99e0611a4daa9a517c57efaf4138d544e798eab6ee9d6c5015f4fde  ../preparation/source.patch' | sha256sum -c -
+          git apply --check ../preparation/source.patch
+          git apply --index ../preparation/source.patch
+          mkdir -p ../evidence
+          git rev-parse HEAD > ../evidence/base-sha.txt
+          python corpora/vectors-uncertain-effect/gen_vectors.py
+          uv sync --locked --extra generators
+      - name: Lint focused Python delta
+        working-directory: source
+        shell: bash
+        run: |
+          set -euo pipefail
+          uv run --locked --extra generators ruff check corpora/vectors-uncertain-effect/gen_vectors.py corpora/vectors-uncertain-effect/tests/test_billing_evidence.py | tee ../evidence/ruff.log
+      - name: Check records and focused regression suite
+        working-directory: source
+        shell: bash
+        run: |
+          set -euo pipefail
+          uv run --locked --extra generators python -m pytest -q corpora/vectors-uncertain-effect/tests | tee ../evidence/pytest.log
+          uv run --locked --extra generators python packaging/run_vectors.py --corpus vectors-uncertain-effect --report ../evidence/cli-report.json | tee ../evidence/cli.log
+      - name: Regenerate dependent records using upstream generators
+        working-directory: source
+        shell: bash
+        run: |
+          set -euo pipefail
+          uv run --locked --extra generators python scripts/regenerate-derived.py | tee ../evidence/regenerate.log
+          uv run --locked --extra generators python scripts/regenerate-derived.py --check | tee ../evidence/regenerate-check.log
+      - name: Check count and corpus registration
+        working-directory: source
+        shell: bash
+        run: |
+          set -euo pipefail
+          git add corpora/vectors-uncertain-effect release/CORPUS-DIGESTS.txt release/intake interop/agentavow-signed-map-v1/source-lock.json
+          uv run --locked --extra generators python scripts/count-gate.py | tee ../evidence/count.log
+          uv run --locked --extra generators python scripts/corpus-registry.py --check | tee ../evidence/registry.log
+          git diff --cached --check
+          python - <<'PY'
+          import subprocess
+          paths = subprocess.check_output(['git','diff','--cached','--name-only'],text=True).splitlines()
+          def allowed(p):
+              return p.startswith(('corpora/vectors-uncertain-effect/','release/intake/')) or p in {'release/CORPUS-DIGESTS.txt','interop/agentavow-signed-map-v1/source-lock.json'}
+          assert paths and all(allowed(p) for p in paths), paths
+          old = subprocess.check_output(['git','ls-tree','-r','HEAD','corpora/vectors-uncertain-effect/cases'],text=True)
+          for row in old.splitlines():
+              left,path=row.split('\t'); sha=left.split()[2]
+              actual=subprocess.check_output(['git','hash-object',path],text=True).strip()
+              assert actual==sha, path
+          assert not subprocess.check_output(['git','diff','--cached','--name-only','--','packaging/agent_evidence_vectors/uncertaineffect.py','corpusreaders'],text=True).strip()
+          PY
+      - name: Commit only qualified changes on owned candidate branch
+        working-directory: source
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git ls-remote origin refs/heads/$TARGET_BRANCH | cut -f1)" = "$BASE_SHA"
+          git config user.name 'Mohammed Messaoudene'
+          git config user.email '248361935+mohammedmessaoudene-cmd@users.noreply.github.com'
+          git commit -m 'test(uncertain-effect): distinguish invoices from effect authority' -m 'Add the P04 F04/F08 records and paired controls requested in #435. Preserve existing checks, runtime scenarios and prior case bytes. Derive manifests and intake records with the upstream generators. Personal DCO attestation is intentionally not added by automation.'
+          git rev-parse HEAD > ../evidence/candidate-sha.txt
+          git rev-parse HEAD^{tree} > ../evidence/candidate-tree.txt
+          git diff "$BASE_SHA" HEAD --binary > ../evidence/contribution.patch
+          git archive --format=tar HEAD | gzip -n > ../evidence/candidate-source.tar.gz
+          sha256sum ../evidence/candidate-source.tar.gz > ../evidence/candidate-source.sha256
+          git push origin "HEAD:refs/heads/$TARGET_BRANCH"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: p04-billing-preparation-evidence
+          path: evidence/
+          if-no-files-found: error
+          retention-days: 14

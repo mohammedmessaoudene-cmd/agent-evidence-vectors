@@ -1,6 +1,0 @@
-suite: acs-core-negative-conformance
-members: 140
-  accept: 51
-  indeterminate: 3
-  reject: 86
-verdict: every member behaves as MANIFEST.json declares

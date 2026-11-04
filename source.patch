@@ -1,0 +1,206 @@
+diff --git a/corpora/vectors-uncertain-effect/CHANGES.md b/corpora/vectors-uncertain-effect/CHANGES.md
+new file mode 100644
+index 0000000..6a90176
+--- /dev/null
++++ b/corpora/vectors-uncertain-effect/CHANGES.md
+@@ -0,0 +1,25 @@
++# Uncertain-effect corpus changes
++
++## Unreleased — billing evidence and effect authority
++
++Adds the generated P04 F04/F08 examples and their safe controls requested in
++[issue #435](https://github.com/probityai/agent-evidence-vectors/issues/435).
++The manifest derives the new population and digest. Earlier case files remain
++unchanged; no check, reason code, runtime scenario or default-corpus revision is
++redefined. A release/tag is a separate maintainer action.
++
++Expected invariant: an unresolved attempt is retried only with the existing
++owner-backed protection, and an unknown effect is not reported as settled.
++Failure condition: a final invoice is substituted for an owner reconciliation,
++or a zero invoice is treated as evidence that the effect did not occur.
++Observable: retry_after_unknown or outcome_settled_without_authority; the paired
++controls return allow/effect_held. The synthetic billing annotation is not
++itself a source of authority. These are record checks, not authentic billing,
++production runtime experiments or validation of the sibling billing contract.
++
++Source and case design: Mohammed Messaoudene, P04 at
++[c7edf5a](https://github.com/mohammedmessaoudene-cmd/agent-evidence-lab/tree/c7edf5abbdb920e115d791f686bc04cf0524b481/collaborations/open-evidence-lab/p04-execution-billing).
++Scope and mapping: astrogilda in issue #435. The separate X1/M4 challenge is
++credited to piiiico (Agent Errata) and remains outside these record additions.
++Implementation and validation of this contribution used AI assistance; it is
++not an independently authored reader or independent human validation.
+diff --git a/corpora/vectors-uncertain-effect/README.md b/corpora/vectors-uncertain-effect/README.md
+index 6beee31..3d5c800 100644
+--- a/corpora/vectors-uncertain-effect/README.md
++++ b/corpora/vectors-uncertain-effect/README.md
+@@ -159,3 +159,24 @@ A verifier under test takes `record.json --json`, prints one JSON object carryin
+ `decision` and `reason`, and exits 0 for `allow` and 1 for `deny`.
+ `aee-verify vectors-uncertain-effect` judges the same cases with the Go reader.
+ Regenerate the cases with `python3 vectors-uncertain-effect/gen_vectors.py`.
++
++## Billing evidence is not effect authority
++
++The billing-labelled cases originate in Mohammed Messaoudene's
++[P04 candidate](https://github.com/mohammedmessaoudene-cmd/agent-evidence-lab/tree/c7edf5abbdb920e115d791f686bc04cf0524b481/collaborations/open-evidence-lab/p04-execution-billing),
++following [the scoped request in issue #435](https://github.com/probityai/agent-evidence-vectors/issues/435).
++A final invoice does not authorize a retry after an unknown attempt; a zero invoice
++does not establish that the business effect never occurred. Their controls supply
++an authoritative final absent reconciliation before retry, or leave the outcome
++unknown, respectively. They use the existing checks and reason codes.
++
++`billingObservations` is a synthetic explanatory annotation in these fixtures.
++It is not an effect-owner answer, an authenticated invoice, or a new normative
++billing interface. Removing that annotation must not change the verdict.
++The existing runtime scenarios are unchanged: these additions exercise record
++reading, not injection of invoices into a live runtime. `reservation.charged`
++continues to mean held effect capacity, not P04's money ledger. Execution success
++with unresolved billing, and the separate X1/M4 local dispatch-state requirement,
++belong to a separately specified sibling corpus, not this contract.
++
++See [CHANGES.md](CHANGES.md) for attribution and release scope.
+diff --git a/corpora/vectors-uncertain-effect/gen_vectors.py b/corpora/vectors-uncertain-effect/gen_vectors.py
+index 0e0030e..a568d01 100644
+--- a/corpora/vectors-uncertain-effect/gen_vectors.py
++++ b/corpora/vectors-uncertain-effect/gen_vectors.py
+@@ -409,10 +409,50 @@ def _cancel_cases() -> list[Case]:
+     ]
+ 
+ 
++def _billing_cases() -> list[Case]:
++    """P04 F04/F08: an invoice is not an effect-owner reconciliation (#435).
++
++    billingObservations is synthetic explanatory input, not an authority field
++    or a billing extension to uncertain-effect/v1. The reader is unchanged.
++    """
++    lost = attempt(1, 1, "timeout")
++    resend = attempt(2, 40, "confirmed")
++    invoice = [{"at": ts(20), "kind": "final_invoice", "amountMicrousd": 1,
++                "source": "billing-service", "operationId": "op-1"}]
++    zero = [{**invoice[0], "amountMicrousd": 0}]
++    return [
++        ("billing-final-invoice-does-not-authorize-retry",
++         build("billing-final-invoice-does-not-authorize-retry", [lost, resend],
++               "committed", 1, reservation=held(), billingObservations=invoice),
++         "deny", "retry_after_unknown", "lost-before-commit",
++         "P04 F04: a final invoice arrives after a lost reply; without an owner "
++         "reconciliation or deduplication the resend is unsafe, even if only one effect lands"),
++        ("allow-billing-final-invoice-owner-absent-before-retry",
++         build("allow-billing-final-invoice-owner-absent-before-retry", [lost, resend],
++               "committed", 1, lookups=[lookup(30, "absent")], reservation=held(),
++               billingObservations=invoice),
++         "allow", reader.ALLOWED_REASON, "lost-before-commit",
++         "P04 F04 control: the same invoice and resend, but a final owner answer "
++         "finds the effect absent before the resend"),
++        ("billing-zero-invoice-does-not-establish-no-effect",
++         build("billing-zero-invoice-does-not-establish-no-effect", [lost],
++               "not_run", 1, reservation=held(), billingObservations=zero),
++         "deny", "outcome_settled_without_authority", "owner-unreachable-after-lost-reply",
++         "P04 F08: a zero invoice after a lost reply does not settle the external "
++         "effect as not run; no owner answer was received"),
++        ("allow-billing-zero-invoice-keeps-outcome-unknown",
++         build("allow-billing-zero-invoice-keeps-outcome-unknown", [lost],
++               "unknown", 1, reservation=held(), billingObservations=zero),
++         "allow", reader.ALLOWED_REASON, "owner-unreachable-after-lost-reply",
++         "P04 F08 control: the same zero invoice leaves the external outcome "
++         "unknown and the effect reservation charged"),
++    ]
++
++
+ def cases() -> list[Case]:
+     """Every case: id, record, decision, reason, runtime scenario id, and what it shows."""
+     return [*_controls(), *_identity_cases(), *_dispatch_cases(), *_outcome_cases(),
+-            *_cancel_cases()]
++            *_cancel_cases(), *_billing_cases()]
+ 
+ 
+ def corpus_digest(manifest: dict[str, Any], root: str) -> str:
+diff --git a/corpora/vectors-uncertain-effect/tests/test_billing_evidence.py b/corpora/vectors-uncertain-effect/tests/test_billing_evidence.py
+new file mode 100644
+index 0000000..2c139fb
+--- /dev/null
++++ b/corpora/vectors-uncertain-effect/tests/test_billing_evidence.py
+@@ -0,0 +1,84 @@
++"""Billing evidence never becomes effect-owner reconciliation (issue #435)."""
++from __future__ import annotations
++
++import copy
++import importlib.util
++from pathlib import Path
++
++import pytest
++
++ROOT = Path(__file__).resolve().parents[1]
++spec = importlib.util.spec_from_file_location("billing_case_generator", ROOT / "gen_vectors.py")
++assert spec and spec.loader
++generator = importlib.util.module_from_spec(spec)
++spec.loader.exec_module(generator)
++from agent_evidence_vectors import uncertaineffect as reader  # noqa: E402
++
++EXPECTED = {
++    "billing-final-invoice-does-not-authorize-retry": ("deny", "retry_after_unknown"),
++    "allow-billing-final-invoice-owner-absent-before-retry": ("allow", "effect_held"),
++    "billing-zero-invoice-does-not-establish-no-effect": ("deny", "outcome_settled_without_authority"),
++    "allow-billing-zero-invoice-keeps-outcome-unknown": ("allow", "effect_held"),
++}
++
++
++def records() -> dict[str, dict]:  # type: ignore[type-arg]
++    all_cases = {case[0]: case for case in generator.cases()}
++    assert set(EXPECTED) <= set(all_cases)
++    return {name: all_cases[name][1] for name in EXPECTED}
++
++
++@pytest.mark.parametrize("name", sorted(EXPECTED))
++def test_billing_cases_match_unchanged_reader(name: str) -> None:
++    record = records()[name]
++    reason = reader._first_failure(record, frozenset())
++    actual = ("deny", reason) if reason else ("allow", reader.ALLOWED_REASON)
++    assert actual == EXPECTED[name]
++    assert record["billingObservations"][0]["kind"] == "final_invoice"
++
++
++def test_retry_pair_differs_only_in_owner_reconciliation_and_identity() -> None:
++    data = records()
++    refused = copy.deepcopy(data["billing-final-invoice-does-not-authorize-retry"])
++    allowed = copy.deepcopy(data["allow-billing-final-invoice-owner-absent-before-retry"])
++    assert refused.pop("reconciliations") == []
++    assert allowed.pop("reconciliations") == [generator.lookup(30, "absent")]
++    refused.pop("recordId")
++    allowed.pop("recordId")
++    assert refused == allowed
++
++
++def test_zero_invoice_pair_differs_only_in_reported_outcome_and_identity() -> None:
++    data = records()
++    refused = copy.deepcopy(data["billing-zero-invoice-does-not-establish-no-effect"])
++    allowed = copy.deepcopy(data["allow-billing-zero-invoice-keeps-outcome-unknown"])
++    assert refused.pop("reported") == {"outcome": "not_run"}
++    assert allowed.pop("reported") == {"outcome": "unknown"}
++    refused.pop("recordId")
++    allowed.pop("recordId")
++    assert refused == allowed
++
++
++@pytest.mark.parametrize("name", sorted(EXPECTED))
++def test_invoice_annotation_cannot_change_authoritative_reading(name: str) -> None:
++    record = records()[name]
++    before = (reader.settled_outcome(record), reader._first_failure(record, frozenset()))
++    del record["billingObservations"]
++    assert (reader.settled_outcome(record), reader._first_failure(record, frozenset())) == before
++
++
++@pytest.mark.parametrize("name", [name for name in EXPECTED if EXPECTED[name][0] == "deny"])
++def test_each_new_denial_forces_its_existing_rule(name: str) -> None:
++    record = records()[name]
++    reason = EXPECTED[name][1]
++    assert reader._first_failure(record, frozenset({reason})) is None
++
++
++def test_billing_is_not_a_new_effect_capacity_release_rule() -> None:
++    data = records()
++    for record in data.values():
++        assert record["reservation"]["charged"] is True
++    for name in ("billing-zero-invoice-does-not-establish-no-effect",
++                 "allow-billing-zero-invoice-keeps-outcome-unknown"):
++        assert data[name]["billingObservations"][0]["amountMicrousd"] == 0
++        assert reader.settled_outcome(data[name]) == "unknown"
